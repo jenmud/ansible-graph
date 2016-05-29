@@ -3,11 +3,13 @@ Scrape an ansable inventory and build a dependency graph.
 """
 from ruruki.graphs import Graph
 
-__all__ = ["GRAPH", "scrape", "scrape_hosts"]
+__all__ = ["GRAPH", "scrape", "scrape_hosts", "scrape_playbook"]
 
 GRAPH = Graph()
 GRAPH.add_vertex_constraint("HOST", "name")
 GRAPH.add_vertex_constraint("GROUP", "name")
+GRAPH.add_vertex_constraint("PLAY", "name")
+GRAPH.add_vertex_constraint("TASK", "name")
 
 
 def _link_node_to_groups(node, groups, edge_label="HAS-GROUP"):
@@ -60,9 +62,48 @@ def scrape_hosts(hosts):
 
 def scrape(inventory):
     """
-    Scrape the inventories and build a graph.
+    Scrape the inventory and build a graph.
 
-    :param inventory: Inventories that you are scrapping.
+    :param inventory: Inventory that you are scrapping.
     :type inventory: :class:`ansible.inventory.Inventory`
     """
     scrape_hosts(inventory.get_hosts())
+
+
+def scrape_tasks(tasks):
+    """
+    Scrape interesting information about all the tasks.
+
+    :param hosts: Iterable of tasks to scrape.
+    :type hosts: Iterable of :class:`ansible.play.task.Task`
+    """
+    for task in tasks:
+        for t in task:
+            variables = t.get_vars()
+
+            node = GRAPH.get_or_create_vertex(
+                "TASK",
+                name=t.get_name(),
+                **variables
+            )
+            yield node
+            #_link_node_to_groups(node, host.get_groups())
+
+
+def scrape_playbook(playbook):
+    """
+    Scrape the playbook and build a graph.
+
+    :param inventory: Playbook that you are scrapping.
+    :type inventory: :class:`ansible.playbook.Playbook`
+    """
+    for play in playbook.get_plays():
+        variables = play.get_vars()
+        node = GRAPH.get_or_create_vertex(
+            "PLAY",
+            name=play.get_name(),
+            **variables
+        )
+
+        for t in scrape_tasks(play.get_tasks()):
+            GRAPH.get_or_create_edge(node, "HAS-TASK", t)

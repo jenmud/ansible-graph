@@ -7,11 +7,12 @@ import logging
 from ansible.inventory import Inventory
 from ansible.vars import VariableManager
 from ansible.parsing.dataloader import DataLoader
+from ansible.playbook import Playbook
 from ruruki_eye.server import run
 from ansible_graph.scrape import GRAPH
-from ansible_graph.scrape import scrape
+from ansible_graph.scrape import scrape, scrape_playbook
 
-__all__ = ["create_inventory", "parse_arguments"]
+__all__ = ["create_playbook", "create_inventory", "parse_arguments"]
 
 LOADER = DataLoader()
 VARIABLE_MANAGER = VariableManager()
@@ -41,6 +42,32 @@ def create_inventory(inventory_path):
         )
 
     return inventory
+
+
+def create_playbook(playbook_path):
+    """
+    Load the given playbook and return the ansible playbook.
+
+    :param playbook_path: Path to the playbook file.
+    :type playbook_path: :class:`str`
+    :returns: The loaded ansible playbook.
+    :rtype: :class:`ansible.playbook.Playbook`
+    """
+    play = Playbook.load(
+        playbook_path,
+        variable_manager=VARIABLE_MANAGER,
+        loader=LOADER,
+    )
+
+    try:
+        scrape_playbook(play)
+    except Exception as error:  # pylint: disable=broad-except
+        logging.exception(
+            "Unexpected error scrapping inventroy %s: %r",
+            playbook_path, error
+        )
+
+    return play
 
 
 def parse_arguments():
@@ -84,6 +111,17 @@ def parse_arguments():
         required=True,
         help=(
             "One of more inventories to load and scrape."
+        ),
+    )
+
+    parser.add_argument(
+        "-p",
+        "--playbooks",
+        nargs="*",
+        type=create_playbook,
+        required=False,
+        help=(
+            "One of more playbooks to load and scrape."
         ),
     )
 
