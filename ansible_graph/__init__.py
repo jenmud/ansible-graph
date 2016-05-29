@@ -1,14 +1,17 @@
+"""
+Setup the environment by parsing the command line options and staring
+a ruruki http server.
+"""
 import argparse
-from ansible_graph.scrape import scrape
-from ansible_graph.scrape import GRAPH
-from ansible.parsing.dataloader import DataLoader
+import logging
 from ansible.inventory import Inventory
 from ansible.vars import VariableManager
-import logging
+from ansible.parsing.dataloader import DataLoader
 from ruruki_eye.server import run
+from ansible_graph.scrape import GRAPH
+from ansible_graph.scrape import scrape
 
-
-__all__ = ["GRAPH", "scrape", "scrape_hosts"]
+__all__ = ["create_inventory", "parse_arguments"]
 
 LOADER = DataLoader()
 VARIABLE_MANAGER = VariableManager()
@@ -31,11 +34,10 @@ def create_inventory(inventory_path):
 
     try:
         scrape(inventory)
-    except Exception as error:
+    except Exception as error:  # pylint: disable=broad-except
         logging.exception(
-            "Unexpected error scrapping inventroy {}: {}".format(
-                inventory_path, error
-            )
+            "Unexpected error scrapping inventroy %s: %r",
+            inventory_path, error
         )
 
     return inventory
