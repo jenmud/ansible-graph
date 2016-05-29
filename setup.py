@@ -42,7 +42,7 @@ auto_version_setup(
     ],
     entry_points={
         "console_scripts": [
-            "ansible-graph = ansible_graph.scraper:run",
+            "ansible-graph = ansible_graph:main",
         ],
     },
 )
