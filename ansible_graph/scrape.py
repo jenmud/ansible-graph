@@ -26,6 +26,9 @@ def _link_node_to_groups(node, groups, edge_label="HAS-GROUP"):
     :type edge_label: :class:`str`
     """
     for group in groups:
+        if group.get_name() == "all":
+            continue
+
         group_node = GRAPH.get_or_create_vertex(
             "GROUP",
             name=group.get_name(),
