@@ -10,12 +10,26 @@ from ansible.parsing.dataloader import DataLoader
 from ansible.playbook import Playbook
 from ruruki_eye.server import run
 from ansible_graph.scrape import GRAPH
-from ansible_graph.scrape import scrape, scrape_playbook
+from ansible_graph.scrape import scrape_inventroy, scrape_playbook
+import os
+
 
 __all__ = ["create_playbook", "create_inventory", "parse_arguments"]
 
+
 LOADER = DataLoader()
 VARIABLE_MANAGER = VariableManager()
+
+
+def setup_loader(path):
+    """
+    Setup the ansible loader with the base dir path.
+
+    :param path: Ansible base directory path.
+    :type path: :class:`str`
+    """
+    logging.info("Updated ansible loader basedir to %r", path)
+    LOADER.set_basedir(path)
 
 
 def create_inventory(inventory_path):
@@ -27,21 +41,22 @@ def create_inventory(inventory_path):
     :returns: The loaded ansible inventory.
     :rtype: :class:`ansible.inventory.Inventory`
     """
-    inventory = Inventory(
-        loader=LOADER,
-        variable_manager=VARIABLE_MANAGER,
-        host_list=inventory_path,
-    )
-
     try:
-        scrape(inventory)
+        inventory = Inventory(
+            loader=LOADER,
+            variable_manager=VARIABLE_MANAGER,
+            host_list=inventory_path,
+        )
+
+        scrape_inventroy(inventory)
+        return inventory
     except Exception as error:  # pylint: disable=broad-except
         logging.exception(
-            "Unexpected error scrapping inventroy %s: %r",
+            "Unexpected error scrapping inventory %r: %r",
             inventory_path, error
         )
 
-    return inventory
+        raise argparse.ArgumentTypeError(error)
 
 
 def create_playbook(playbook_path):
@@ -53,21 +68,22 @@ def create_playbook(playbook_path):
     :returns: The loaded ansible playbook.
     :rtype: :class:`ansible.playbook.Playbook`
     """
-    play = Playbook.load(
-        playbook_path,
-        variable_manager=VARIABLE_MANAGER,
-        loader=LOADER,
-    )
-
     try:
-        scrape_playbook(play)
+        playbook = Playbook.load(
+            playbook_path,
+            loader=LOADER,
+            variable_manager=VARIABLE_MANAGER,
+        )
+
+        scrape_playbook(playbook)
+        return playbook
     except Exception as error:  # pylint: disable=broad-except
         logging.exception(
-            "Unexpected error scrapping inventroy %s: %r",
+            "Unexpected error scrapping playbook %r: %r",
             playbook_path, error
         )
 
-    return play
+        raise argparse.ArgumentTypeError(error)
 
 
 def parse_arguments():
@@ -79,6 +95,14 @@ def parse_arguments():
     """
     parser = argparse.ArgumentParser(
         description="Ansible inventory grapher."
+    )
+
+    parser.add_argument(
+        "-b",
+        "--base-dir",
+        default=os.getcwd(),
+        type=setup_loader,
+        help="Ansible base directory path (default: %(default)s)",
     )
 
     parser.add_argument(
@@ -108,7 +132,7 @@ def parse_arguments():
         "--inventories",
         nargs="*",
         type=create_inventory,
-        required=True,
+        required=False,
         help=(
             "One of more inventories to load and scrape."
         ),

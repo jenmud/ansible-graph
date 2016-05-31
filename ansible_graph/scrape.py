@@ -3,7 +3,7 @@ Scrape an ansable inventory and build a dependency graph.
 """
 from ruruki.graphs import Graph
 
-__all__ = ["GRAPH", "scrape", "scrape_hosts", "scrape_playbook"]
+__all__ = ["GRAPH", "scrape_inventroy", "scrape_hosts", "scrape_playbook"]
 
 GRAPH = Graph()
 GRAPH.add_vertex_constraint("HOST", "name")
@@ -63,7 +63,7 @@ def scrape_hosts(hosts):
         _link_node_to_groups(node, host.get_groups())
 
 
-def scrape(inventory):
+def scrape_inventroy(inventory):
     """
     Scrape the inventory and build a graph.
 
