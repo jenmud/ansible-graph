@@ -1,5 +1,5 @@
 # ansible-graph
-A script that will scrape a ansible inventory or playbook and build a dependency graph representation.
+A script that will scrape a Ansible inventory or playbook and build a dependency graph representation.
 
 This is still a work in progress!
 
