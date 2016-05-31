@@ -4,6 +4,7 @@ a ruruki http server.
 """
 import argparse
 import logging
+import os
 from ansible.inventory import Inventory
 from ansible.vars import VariableManager
 from ansible.parsing.dataloader import DataLoader
@@ -11,7 +12,6 @@ from ansible.playbook import Playbook
 from ruruki_eye.server import run
 from ansible_graph.scrape import GRAPH
 from ansible_graph.scrape import scrape_inventroy, scrape_playbook
-import os
 
 
 __all__ = ["create_playbook", "create_inventory", "parse_arguments"]

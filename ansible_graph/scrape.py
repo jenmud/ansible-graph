@@ -81,12 +81,12 @@ def scrape_tasks(tasks):
     :type hosts: Iterable of :class:`ansible.play.task.Task`
     """
     for task in tasks:
-        for t in task:
-            variables = t.get_vars()
+        for task in task:
+            variables = task.get_vars()
 
             node = GRAPH.get_or_create_vertex(
                 "TASK",
-                name=t.get_name(),
+                name=task.get_name(),
                 **variables
             )
             yield node
@@ -108,5 +108,5 @@ def scrape_playbook(playbook):
             **variables
         )
 
-        for t in scrape_tasks(play.get_tasks()):
-            GRAPH.get_or_create_edge(node, "HAS-TASK", t)
+        for task in scrape_tasks(play.get_tasks()):
+            GRAPH.get_or_create_edge(node, "HAS-TASK", task)
