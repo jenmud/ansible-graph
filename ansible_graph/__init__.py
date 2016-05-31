@@ -14,7 +14,7 @@ from ansible_graph.scrape import GRAPH
 from ansible_graph.scrape import scrape_inventroy, scrape_playbook
 
 
-__all__ = ["create_playbook", "create_inventory", "parse_arguments"]
+__all__ = ["create_playbook", "create_inventory"]
 
 
 LOADER = DataLoader()
