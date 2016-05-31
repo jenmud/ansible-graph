@@ -15,9 +15,10 @@ This is still a work in progress!
 
 # Installing and Developing
 
-## Clone the project
+## Fork the project and clone it
 ```bash
-$ git clone https://github.com/jenmud/ansible-graph.git
+# Assuming that you have forked the repo
+$ git clone https://github.com/<username>/ansible-graph.git
 ```
 
 ## Clone ansible examples
