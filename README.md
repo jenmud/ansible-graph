@@ -10,6 +10,7 @@ This is still a work in progress!
 * Get roles variables
 * Get template files for a role
 * Get files for a role
+* Add in tests!!
 
 
 # Installing and Developing
@@ -50,6 +51,7 @@ Example of interesting output (assuming that vertice with name=mongo1 has the id
 http://localhost:8000/vertices/19?levels=1
 ```
 
+![Screenshot](/ansible-graph.png)
 
 
 
