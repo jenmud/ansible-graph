@@ -23,7 +23,7 @@ $ git clone https://github.com/<username>/ansible-graph.git
 
 ## Clone ansible examples
 ```bash
-$ git clone https://github.com/ansible/ansible-examples
+$ git clone https://github.com/ansible/ansible-examples.git
 ```
 
 ## Get it installed using a python virtualenv
